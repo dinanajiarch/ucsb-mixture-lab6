@@ -1,0 +1,16 @@
+TITLE:
+Class 3
+DATA:
+FILE = "C:/Users/Dina Arch/Box/TA - ED 201/Labs/ucsb-mixture-lab6/enum_lpa/lpa_pisa.dat";
+ 
+VARIABLE:
+NAMES = broad_interest enjoyment instrumental_mot self_efficacy; 
+ MISSING=.;
+ usevar = broad_interest-self_efficacy;
+classes = c(3); 
+ANALYSIS:
+estimator = mlr; 
+    type = mixture;
+    starts = 100 20;
+OUTPUT:
+sampstat residual tech11 tech14;
