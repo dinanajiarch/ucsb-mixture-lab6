@@ -36,6 +36,7 @@ library(gt)
 library(tidyLPA)
 library(pisaUSA15)
 library(cowplot)
+library(filesstrings)
 here::i_am("lpa.Rmd")
 ```
 
@@ -66,7 +67,7 @@ Latent Profile Models:
 
 ------------------------------------------------------------------------
 
-### Prepare Data
+## Prepare Data
 
 ```{r, eval=TRUE}
 
@@ -77,7 +78,7 @@ pisa <- pisaUSA15[1:500,] %>%
 
 ------------------------------------------------------------------------
 
-### Descriptive Statistics
+## Descriptive Statistics
 
 ```{r}
 ds <- pisa %>% 
@@ -104,32 +105,48 @@ ds %>%
 
 ------------------------------------------------------------------------
 
-### Enumeration
+## Enumeration
+
+------------------------------------------------------------------------
+
+### `tidyLPA`
+
+------------------------------------------------------------------------
 
 Enumerate using `estimate_profiles()`:
 
--   Estimate models with classes $K = 1:3$
+-   Estimate models with classes $K = 1:4$
 -   Model has 4 continuous indicators
 -   Default variance-covariance specifications (model 1)
--   Add line `scale() %>%` to center indicator means
 -   Change `variances` and `covariances` to indicate the model you want to specify (see Vignette)
 
-```{r, eval=TRUE}
-lpa_models <- pisa %>% 
+```{r, eval=FALSE}
+
+# Run LPA models 
+pisa %>% 
     estimate_profiles(1:4,
                       package = "MplusAutomation",
                       ANALYSIS = "starts = 100, 20;",
-                      variances = c("equal"),
-                      covariances = c("zero"))
+                      variances = c("equal", "varying", "equal", "varying"),
+                      covariances = c("zero", "zero", "equal", "equal"),
+                      keepfiles = TRUE)
 
-get_fit(lpa_models)
+# Move files to folder 
+files <- list.files(here(), pattern = "^model")
+file.move(files, here("tidyLPA"))
 ```
+
+------------------------------------------------------------------------
+
+### `Mplus`
 
 ------------------------------------------------------------------------
 
 Alternative method to `estimate_profiles()`: Run enumeration using `mplusObject` method
 
-You can change the model specification for LPA using the synax provided in lecture.
+You can change the model specification for LPA using the syntax provided in lecture.
+
+#### Model 1 
 
 ```{r, cache = TRUE, eval = FALSE}
 
@@ -154,22 +171,64 @@ lpa_k14  <- lapply(1:4, function(k) {
 
 lpa_enum_fit <- mplusModeler(lpa_enum, 
                 dataout=glue(here("enum_lpa", "lpa_pisa.dat")),
-                modelout=glue(here("enum_lpa", "c{k}_lpa_pisa.inp")) ,
+                modelout=glue(here("enum_lpa", "c{k}_lpa_m1.inp")) ,
                 check=TRUE, run = TRUE, hashfilename = FALSE)
 })
-
 ```
+
+#### Model 2
+
+```{r, eval = FALSE}
+lpa_m2_k14  <- lapply(1:4, function(k){ 
+  
+  MODEL <- lapply(1:k, function(i){
+    
+    glue("
+    
+    %c#{i}%
+   broad_interest-self_efficacy;      ! variances are freely estimated
+   
+   ")
+  })
+  
+  lpa_enum_m2  <- mplusObject(
+    TITLE = glue("Class {k} - Model2"),
+    
+    VARIABLE = glue(
+      "usevar = broad_interest-self_efficacy;
+     classes = c({k});"),
+    
+    ANALYSIS = 
+      "estimator = mlr; 
+    type = mixture;
+    starts = 100 20;",
+    
+    MODEL = glue("{MODEL[1:k]}"),
+    
+    
+    OUTPUT = "sampstat residual tech11 tech14;",
+    
+    usevariables = colnames(pisa),
+    rdata = pisa)
+  
+  lpa_m2_fit <- mplusModeler(lpa_enum_m2,
+                             dataout = here("enum_lpa", "lpa_pisa.dat"),
+                             modelout = glue(here("enum_lpa","c{k}_lpa_m2.inp")),
+                             check = TRUE, run = TRUE, hashfilename = FALSE)
+})
+```
+
 
 ------------------------------------------------------------------------
 
-### Table of Fit
+## Table of Fit
 
 APA formatted model fit table with additional fit indices
 
 Extract data:
 
 ```{r}
-output_pisa <- readModels(here("enum_lpa"), filefilter = "lpa", quiet = TRUE)
+output_pisa <- readModels(here("tidyLPA"), quiet = TRUE)
 
 enum_extract <- LatexSummaryTable(
   output_pisa,
@@ -180,7 +239,6 @@ enum_extract <- LatexSummaryTable(
     "BIC",
     "aBIC",
     "BLRT_PValue",
-    "T11_VLMR_PValue",
     "Observations"
   )
 )
@@ -193,8 +251,9 @@ allFit <- enum_extract %>%
   mutate(expSIC = exp(SIC - max(SIC))) %>%
   mutate(BF = exp(SIC - lead(SIC))) %>%
   mutate(cmPk = expSIC / sum(expSIC)) %>%
-  dplyr::select(1:5, 9:10, 6:7, 13, 14) %>%
-  arrange(Parameters)
+  dplyr::select(1:5, 8:9, 6, 12, 13) %>%
+  mutate(Title = str_to_title(Title)) %>% 
+  arrange(Title)
 ```
 
 Create table:
@@ -207,7 +266,6 @@ allFit %>%
     Title = "Classes",
     Parameters = md("Par"),
     LL = md("*LL*"),
-    T11_VLMR_PValue = "VLMR",
     BLRT_PValue = "BLRT",
     BF = md("BF"),
     cmPk = md("*cmPk*")
@@ -223,74 +281,56 @@ VLMR = Vuong-Lo-Mendell-Rubin adjusted likelihood ratio test p-value;
 *cmPk* = approximate correct model probability."
     ),
 locations = cells_title()
-  ) %>%
+  )  %>%
   tab_options(column_labels.font.weight = "bold") %>%
   fmt_number(
-    10,
+    9,
     decimals = 2,
     drop_trailing_zeros = TRUE,
     suffixing = TRUE
   ) %>%
-  fmt_number(c(3:9, 11),
+  fmt_number(c(3:8, 10),
              decimals = 0) %>%
-  fmt_missing(1:11,
+  fmt_missing(1:10,
               missing_text = "--") %>%
   fmt(
-    c(8:9, 11),
+    c(8, 10),
     fns = function(x)
       ifelse(x < 0.001, "<0.001",
              scales::number(x, accuracy = 0.01))
   ) %>%
   fmt(
-    10,
+    9,
     fns = function (x)
       ifelse(x > 100, ">100",
              scales::number(x, accuracy = .1))
-  ) %>%   tab_style(
-    style = list(
-      cell_text(weight = "bold")
-      ),
-    locations = list(cells_body(
-     columns = BIC,
-     row = BIC == min(BIC[c(1:4)]) # Change this to the number of classes you estimated
-    ),
-    cells_body(
-     columns = aBIC,
-     row = aBIC == min(aBIC[1:4])
-    ),
-    cells_body(
-     columns = CAIC,
-     row = CAIC == min(CAIC[1:4])
-    ),
-    cells_body(
-     columns = AWE,
-     row = AWE == min(AWE[1:4])
-    ),
-    cells_body(
-     columns = cmPk,
-     row =  cmPk == max(cmPk[1:4])
-     ),    
-    cells_body(
-     columns = BF,
-     row =  BF > 10),
-    cells_body(
-     columns =  T11_VLMR_PValue,
-     row =  T11_VLMR_PValue < .001),
-    cells_body(
-     columns =  BLRT_PValue,
-     row =  BLRT_PValue < .001)
-  )
-)
+  ) %>% 
+  tab_row_group(
+    label = "Model 1",
+    rows = c(1:4)) %>%
+  tab_row_group(
+    label = "Model 2",
+    rows =c(5:8)) %>%    
+  tab_row_group(
+    label = "Model 3",
+    rows = c(9:12)) %>%
+  tab_row_group(
+    label = "Model 4",
+    rows = c(13:16)) %>%    
+  row_group_order(
+    groups = c("Model 1","Model 2", "Model 3", "Model 4")
+  ) 
 ```
 
 ------------------------------------------------------------------------
 
-### Information Criteria Plot
+## Information Criteria Plot
 
 Plot information criteria
 
 ```{r}
 allFit %>% 
+  filter(grepl("Model 1", Title)) %>% 
   dplyr::select(2:7) %>% 
   rowid_to_column() %>% 
   pivot_longer(`BIC`:`AWE`,
@@ -312,57 +352,25 @@ mutate(Index = factor(Index,
 
 ------------------------------------------------------------------------
 
-### Compare Class Solutions
-
-Compare probability plots for $K = 1:4$ class solutions
+## Compare models
 
 ```{r}
-model_results <- data.frame()
+# MplusAutomation Method using `compareModels` 
 
-for (i in 1:length(output_pisa)) {
-  
-  temp <- output_pisa[[i]]$parameters$unstandardized %>%                                       
-    mutate(model = paste0(i, "-Class Model"))                                                  
-  
-  model_results <- rbind(model_results, temp)
-}
+parallelModels <- readModels(here("tidyLPA"))
 
-rm(temp)
-
-lpa_model <- model_results %>%                                                                         
-  filter(paramHeader == "Means",
-         !grepl('#', param)) %>%  
-  rename(mean = est) %>% 
-  dplyr::select(mean, model, LatentClass, param) %>%                                                        
-  mutate(param = as.factor(str_to_lower(str_sub(param, end = -3)))) 
-
-lpa_model$param <- fct_inorder(lpa_model$param)
-ggplot(lpa_model, aes(x = param, y = mean,                                                             
-           color = LatentClass, shape = LatentClass,                                                       
-           group = LatentClass, lty = LatentClass)) +                                                      
-  geom_point() + geom_line() +                                                                             
-  scale_colour_viridis_d() +                                                                               
-  facet_wrap(~ model, ncol = 2) +                                                                          
-  labs(title = "PISA Student Data",                                             
-       x= " ", y = "Probability") +                                                                        
-  theme_minimal() + theme(panel.grid.major.y = element_blank(),                                            
-                          axis.text.x = element_text(angle = -45, hjust = -.1))                            
-```
-
-save figure
-
-```{r, eval = FALSE}
-ggsave(here("figures", "compare_kprofile_plot.png"), dpi=300, height=5, width=7, units="in")
+compareModels(parallelModels[["model_1_class_2.out"]],
+  parallelModels[["model_1_class_3.out"]], diffTest = TRUE)
 ```
 
 ------------------------------------------------------------------------
 
-###  Latent Profile Plot
+##  Latent Profile Plot
 
 ```{r}
 source("plot_lpa_function.txt")
 
-plot_lpa_function(model_name = output_pisa$c4_lpa_pisa.out)
+plot_lpa_function(model_name = output_pisa$model_1_class_2.out)
 ```
 
 save figure
@@ -373,7 +381,7 @@ ggsave(here("figures", "C4_LPA_Plot.png"), dpi="retina", height=5, width=7, unit
 
 ------------------------------------------------------------------------
 
-# References
+## References
 
 
 Hallquist, M. N., & Wiley, J. F. (2018). MplusAutomation: An R Package for Facilitating Large-Scale Latent Variable Analyses in Mplus. Structural equation modeling: a multidisciplinary journal, 25(4), 621-638.
@@ -389,6 +397,7 @@ Rosenberg, J. M., van Lissa, C. J., Beymer, P. N., Anderson, D. J., Schell, M. J
 R Core Team (2017). R: A language and environment for statistical computing. R Foundation for Statistical Computing, Vienna, Austria. URL http://www.R-project.org/
 
 Wickham et al., (2019). Welcome to the tidyverse. Journal of Open Source Software, 4(43), 1686, https://doi.org/10.21105/joss.01686
+
 ------------------------------------------------------------------------
 
 ![](figures/UCSB_Navy_mark.png){width="75%"}
