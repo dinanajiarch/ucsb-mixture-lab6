@@ -31,7 +31,7 @@ plot_lpa_function <-
       melt(id.vars = "param") %>%
       mutate(param = fct_inorder(param))
     
-    name <- model_name$input$title
+    name <- str_to_title(model_name$input$title) 
     
     p <- plot_data %>%
       ggplot(
