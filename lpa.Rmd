@@ -364,8 +364,8 @@ mutate(Index = factor(Index,
 
 parallelModels <- readModels(here("tidyLPA"))
 
-compareModels(parallelModels[["model_1_class_2.out"]],
-  parallelModels[["model_1_class_3.out"]], diffTest = TRUE)
+compareModels(parallelModels[["model_3_class_2.out"]],
+  parallelModels[["model_4_class_2.out"]], diffTest = TRUE)
 ```
 
 ------------------------------------------------------------------------
