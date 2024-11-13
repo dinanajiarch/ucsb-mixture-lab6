@@ -25,3 +25,6 @@ poLCA
 naniar
 tidyLPA
 pisaUSA15
+lubridate
+patchwork
+RcppAlgos

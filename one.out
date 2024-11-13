@@ -1,0 +1,511 @@
+Mplus VERSION 8.11
+MUTHEN & MUTHEN
+11/12/2024  10:25 AM
+
+INPUT INSTRUCTIONS
+
+  TITLE:
+  Step 1 - Three-Step using LSAL
+  DATA:
+  FILE = "C:/Users/dnajiarch/Box/CRP_Knox/crp_lpa_analyses/manual/Step1.dat";
+  VARIABLE:
+  NAMES = CA CRP CRTE Ready CA_scaled CRP_scaled CRTE_scaled Ready_scaled SchCl_scaled
+       T1_Gender T1_Race T1_Age T1_FieldTime T1_SchTime Gender Race Age;
+   MISSING=.;
+   usevar = CA_scaled CRP_scaled CRTE_scaled Ready_scaled;
+
+     classes = c(3);
+
+     auxiliary =
+     T1_Race, T1_Gender,
+     T1_FieldTime SchCl_scaled T1_SchTime;
+  ANALYSIS:
+  estimator = mlr;
+      type = mixture;
+      starts = 0;
+      optseed = 246794;
+  OUTPUT:
+  residual tech10 tech11 tech14;
+  SAVEDATA:
+  File=3step_savedata.dat;
+      Save=cprob;
+
+
+
+*** WARNING in VARIABLE command
+  Note that only the first 8 characters of variable names are used in the output.
+  Shorten variable names to avoid any confusion.
+*** WARNING in MODEL command
+  All variables are uncorrelated with all other variables within class.
+  Check that this is what is intended.
+*** WARNING in OUTPUT command
+  TECH10 option is only available with categorical, count, or nominal outcomes.
+  Request for TECH10 is ignored.
+*** WARNING
+  Data set contains cases with missing on all variables.
+  These cases were not included in the analysis.
+  Number of cases with missing on all variables:  10
+   4 WARNING(S) FOUND IN THE INPUT INSTRUCTIONS
+
+
+
+
+Step 1 - Three-Step using LSAL
+
+SUMMARY OF ANALYSIS
+
+Number of groups                                                 1
+Number of observations                                         123
+
+Number of dependent variables                                    4
+Number of independent variables                                  0
+Number of continuous latent variables                            0
+Number of categorical latent variables                           1
+
+Observed dependent variables
+
+  Continuous
+   CA_SCALED   CRP_SCALED  CRTE_SCALE  READY_SCAL
+
+Observed auxiliary variables
+   T1_RACE     T1_GENDER   T1_FIELDTI  SCHCL_SCAL  T1_SCHTIME
+
+Categorical latent variables
+   C
+
+
+Estimator                                                      MLR
+Information matrix                                        OBSERVED
+Optimization Specifications for the Quasi-Newton Algorithm for
+Continuous Outcomes
+  Maximum number of iterations                                 100
+  Convergence criterion                                  0.100D-05
+Optimization Specifications for the EM Algorithm
+  Maximum number of iterations                                 500
+  Convergence criteria
+    Loglikelihood change                                 0.100D-06
+    Relative loglikelihood change                        0.100D-06
+    Derivative                                           0.100D-05
+Optimization Specifications for the M step of the EM Algorithm for
+Categorical Latent variables
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+Optimization Specifications for the M step of the EM Algorithm for
+Censored, Binary or Ordered Categorical (Ordinal), Unordered
+Categorical (Nominal) and Count Outcomes
+  Number of M step iterations                                    1
+  M step convergence criterion                           0.100D-05
+  Basis for M step termination                           ITERATION
+  Maximum value for logit thresholds                            15
+  Minimum value for logit thresholds                           -15
+  Minimum expected cell size for chi-square              0.100D-01
+Maximum number of iterations for H1                           2000
+Convergence criterion for H1                             0.100D-03
+Optimization algorithm                                         EMA
+Random Starts Specifications
+  Random seed for analysis                                  246794
+
+Input data file(s)
+  C:/Users/dnajiarch/Box/CRP_Knox/crp_lpa_analyses/manual/Step1.dat
+Input data format  FREE
+
+
+SUMMARY OF DATA
+
+     Number of missing data patterns             7
+     Number of y missing data patterns           7
+     Number of u missing data patterns           0
+
+
+COVARIANCE COVERAGE OF DATA
+
+Minimum covariance coverage value   0.100
+
+
+     PROPORTION OF DATA PRESENT FOR Y
+
+
+           Covariance Coverage
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.911
+ CRP_SCAL       0.870         0.919
+ CRTE_SCA       0.854         0.846         0.862
+ READY_SC       0.911         0.919         0.862         1.000
+
+
+
+UNIVARIATE SAMPLE STATISTICS
+
+
+     UNIVARIATE HIGHER-ORDER MOMENT DESCRIPTIVE STATISTICS
+
+         Variable/         Mean/     Skewness/   Minimum/ % with                Percentiles
+        Sample Size      Variance    Kurtosis    Maximum  Min/Max      20%/60%    40%/80%    Median
+
+     CA_SCALED             0.026       0.265      -1.991    0.89%      -0.696     -0.141      0.044
+             112.000       0.708       0.090       2.450    0.89%       0.229      0.599
+     CRP_SCALED           -0.004       0.144      -2.632    0.88%      -0.658     -0.329      0.000
+             113.000       0.961      -0.078       2.139    2.65%       0.000      0.823
+     CRTE_SCALED           0.017      -0.363      -2.294    2.83%      -0.780     -0.402      0.052
+             106.000       0.912      -0.599       1.339    9.43%       0.355      1.036
+     READY_SCALED          0.088      -0.034      -1.700    3.25%      -0.375     -0.210     -0.210
+             123.000       0.629      -0.670       1.281   16.26%       0.122      0.950
+
+
+THE MODEL ESTIMATION TERMINATED NORMALLY
+
+
+
+MODEL FIT INFORMATION
+
+Number of Free Parameters                       18
+
+Loglikelihood
+
+          H0 Value                        -555.764
+          H0 Scaling Correction Factor      1.0660
+            for MLR
+
+Information Criteria
+
+          Akaike (AIC)                    1147.529
+          Bayesian (BIC)                  1198.148
+          Sample-Size Adjusted BIC        1141.233
+            (n* = (n + 2) / 24)
+
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THE ESTIMATED MODEL
+
+    Latent
+   Classes
+
+       1         11.40723          0.09274
+       2         70.55380          0.57361
+       3         41.03897          0.33365
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON ESTIMATED POSTERIOR PROBABILITIES
+
+    Latent
+   Classes
+
+       1         11.40723          0.09274
+       2         70.55380          0.57361
+       3         41.03897          0.33365
+
+
+FINAL CLASS COUNTS AND PROPORTIONS FOR THE LATENT CLASSES
+BASED ON THEIR MOST LIKELY LATENT CLASS MEMBERSHIP
+
+Class Counts and Proportions
+
+    Latent
+   Classes
+
+       1               11          0.08943
+       2               70          0.56911
+       3               42          0.34146
+
+
+CLASSIFICATION QUALITY
+
+     Entropy                         0.919
+
+
+Average Latent Class Probabilities for Most Likely Latent Class Membership (Row)
+by Latent Class (Column)
+
+           1        2        3
+
+    1   0.925    0.075    0.000
+    2   0.018    0.975    0.008
+    3   0.000    0.036    0.964
+
+
+Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+           1        2        3
+
+    1   0.892    0.108    0.000
+    2   0.012    0.967    0.021
+    3   0.000    0.013    0.987
+
+
+Logits for the Classification Probabilities for the Most Likely Latent Class Membership (Column)
+by Latent Class (Row)
+
+              1        2        3
+
+    1     13.701   11.589    0.000
+    2     -0.600    3.816    0.000
+    3    -13.802   -4.317    0.000
+
+
+MODEL RESULTS
+
+                                                    Two-Tailed
+                    Estimate       S.E.  Est./S.E.    P-Value
+
+Latent Class 1
+
+ Means
+    CA_SCALED          0.021      0.301      0.069      0.945
+    CRP_SCALED        -0.322      0.346     -0.930      0.352
+    CRTE_SCALE        -0.642      0.485     -1.324      0.186
+    READY_SCAL        -1.315      0.171     -7.697      0.000
+
+ Variances
+    CA_SCALED          0.693      0.094      7.342      0.000
+    CRP_SCALED         0.827      0.114      7.274      0.000
+    CRTE_SCALE         0.842      0.111      7.619      0.000
+    READY_SCAL         0.089      0.015      5.779      0.000
+
+Latent Class 2
+
+ Means
+    CA_SCALED          0.128      0.110      1.169      0.242
+    CRP_SCALED        -0.262      0.126     -2.080      0.038
+    CRTE_SCALE        -0.057      0.128     -0.443      0.658
+    READY_SCAL        -0.235      0.054     -4.311      0.000
+
+ Variances
+    CA_SCALED          0.693      0.094      7.342      0.000
+    CRP_SCALED         0.827      0.114      7.274      0.000
+    CRTE_SCALE         0.842      0.111      7.619      0.000
+    READY_SCAL         0.089      0.015      5.779      0.000
+
+Latent Class 3
+
+ Means
+    CA_SCALED         -0.136      0.130     -1.041      0.298
+    CRP_SCALED         0.499      0.183      2.722      0.006
+    CRTE_SCALE         0.296      0.147      2.018      0.044
+    READY_SCAL         1.033      0.050     20.847      0.000
+
+ Variances
+    CA_SCALED          0.693      0.094      7.342      0.000
+    CRP_SCALED         0.827      0.114      7.274      0.000
+    CRTE_SCALE         0.842      0.111      7.619      0.000
+    READY_SCAL         0.089      0.015      5.779      0.000
+
+Categorical Latent Variables
+
+ Means
+    C#1               -1.280      0.440     -2.909      0.004
+    C#2                0.542      0.213      2.547      0.011
+
+
+QUALITY OF NUMERICAL RESULTS
+
+     Condition Number for the Information Matrix              0.629E-03
+       (ratio of smallest to largest eigenvalue)
+
+
+RESIDUAL OUTPUT
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 1
+
+
+           Model Estimated Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+                0.021        -0.322        -0.642        -1.315
+
+
+           Residuals for Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+                0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.693
+ CRP_SCAL       0.000         0.827
+ CRTE_SCA       0.000         0.000         0.842
+ READY_SC       0.000         0.000         0.000         0.089
+
+
+           Residuals for Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.102
+ CRP_SCAL      -0.099        -0.335
+ CRTE_SCA      -0.228         0.275         0.283
+ READY_SC       0.005         0.068         0.016         0.018
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 2
+
+
+           Model Estimated Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+                0.128        -0.262        -0.057        -0.235
+
+
+           Residuals for Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+                0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.693
+ CRP_SCAL       0.000         0.827
+ CRTE_SCA       0.000         0.000         0.842
+ READY_SC       0.000         0.000         0.000         0.089
+
+
+           Residuals for Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.022
+ CRP_SCAL       0.058        -0.050
+ CRTE_SCA      -0.033         0.343         0.030
+ READY_SC       0.020        -0.059         0.007         0.004
+
+
+     ESTIMATED MODEL AND RESIDUALS (OBSERVED - ESTIMATED) FOR CLASS 3
+
+
+           Model Estimated Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+               -0.136         0.499         0.296         1.033
+
+
+           Residuals for Means
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+                0.000         0.000         0.000         0.000
+
+
+           Model Estimated Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE       0.693
+ CRP_SCAL       0.000         0.827
+ CRTE_SCA       0.000         0.000         0.842
+ READY_SC       0.000         0.000         0.000         0.089
+
+
+           Residuals for Covariances
+              CA_SCALE      CRP_SCAL      CRTE_SCA      READY_SC
+              ________      ________      ________      ________
+ CA_SCALE      -0.063
+ CRP_SCAL       0.013         0.171
+ CRTE_SCA      -0.034         0.235        -0.118
+ READY_SC      -0.023         0.095         0.047        -0.012
+
+
+TECHNICAL 11 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                  20
+        Number of final stage optimizations                     4
+
+
+
+     VUONG-LO-MENDELL-RUBIN LIKELIHOOD RATIO TEST FOR 2 (H0) VERSUS 3 CLASSES
+
+          H0 Loglikelihood Value                         -571.107
+          2 Times the Loglikelihood Difference             30.685
+          Difference in the Number of Parameters                5
+          Mean                                             -8.659
+          Standard Deviation                               30.473
+          P-Value                                          0.0215
+
+     LO-MENDELL-RUBIN ADJUSTED LRT TEST
+
+          Value                                            29.461
+          P-Value                                          0.0245
+
+
+TECHNICAL 14 OUTPUT
+
+     Random Starts Specifications for the k-1 Class Analysis Model
+        Number of initial stage random starts                  20
+        Number of final stage optimizations                     4
+
+     Random Starts Specification for the k-1 Class Model for Generated Data
+        Number of initial stage random starts                   0
+        Number of final stage optimizations for the
+           initial stage random starts                          0
+     Random Starts Specification for the k Class Model for Generated Data
+        Number of initial stage random starts                  40
+        Number of final stage optimizations                     8
+     Number of bootstrap draws requested                   Varies
+
+
+     PARAMETRIC BOOTSTRAPPED LIKELIHOOD RATIO TEST FOR 2 (H0) VERSUS 3 CLASSES
+
+          H0 Loglikelihood Value                         -571.107
+          2 Times the Loglikelihood Difference             30.685
+          Difference in the Number of Parameters                5
+          Approximate P-Value                              0.0000
+          Successful Bootstrap Draws                           20
+
+
+SAVEDATA INFORMATION
+
+
+  Save file
+    3step_savedata.dat
+
+  Order and format of variables
+
+    CA_SCALE       F10.3
+    CRP_SCAL       F10.3
+    CRTE_SCA       F10.3
+    READY_SC       F10.3
+    T1_RACE        F10.3
+    T1_GENDE       F10.3
+    T1_FIELD       F10.3
+    SCHCL_SC       F10.3
+    T1_SCHTI       F10.3
+    CPROB1         F10.3
+    CPROB2         F10.3
+    CPROB3         F10.3
+    C              F10.3
+
+  Save file format
+    13F10.3
+
+  Save file record length    10000
+
+  Save missing symbol        *
+
+
+DIAGRAM INFORMATION
+
+  Mplus diagrams are currently not available for Mixture analysis.
+  No diagram output was produced.
+
+
+     Beginning Time:  10:25:49
+        Ending Time:  10:25:55
+       Elapsed Time:  00:00:06
+
+
+
+MUTHEN & MUTHEN
+3463 Stoner Ave.
+Los Angeles, CA  90066
+
+Tel: (310) 391-9971
+Fax: (310) 391-8971
+Web: www.StatModel.com
+Support: Support@StatModel.com
+
+Copyright (c) 1998-2024 Muthen & Muthen
