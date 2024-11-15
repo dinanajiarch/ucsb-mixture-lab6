@@ -231,6 +231,15 @@ pisa <- pisaUSA15[1:500,] %>%
 
 ## Descriptive Statistics
 
+Quick Summary
+
+```{r}
+summary(pisa)
+```
+
+
+Mean Table
+
 ```{r}
 ds <- pisa %>% 
   pivot_longer(broad_interest:self_efficacy, names_to = "variable") %>% 
@@ -252,6 +261,19 @@ ds %>%
     align = "center",
     columns = mean
   ) 
+```
+
+Histograms
+
+```{r}
+data_long <- pisa %>%
+  pivot_longer(broad_interest:self_efficacy, names_to = "variable")
+
+ggplot(data_long, aes(x = value)) +
+  geom_histogram(binwidth = .3, fill = "#69b3a2", color = "black") +
+  facet_wrap(~ variable, scales = "free_x") +
+  labs(title = "Histograms of Variables", x = "Value", y = "Frequency") +
+  theme_cowplot()
 ```
 
 ------------------------------------------------------------------------
